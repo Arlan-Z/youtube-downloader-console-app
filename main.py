@@ -11,6 +11,9 @@ os.makedirs("videos", exist_ok=True)
 
 url_queue = asyncio.Queue()
 
+main_loop = None
+
+
 async def download_video(url: str):
     print(f"▶ Начинаю загрузку: {url}")
 
@@ -36,7 +39,7 @@ async def download_video(url: str):
 
 async def worker():
     while True:
-        url = await url_queue.get()   
+        url = await url_queue.get()
         asyncio.create_task(download_video(url))
 
 
@@ -47,12 +50,16 @@ def input_thread():
         try:
             url = input("URL: ").strip()
             if url:
-                asyncio.run_coroutine_threadsafe(url_queue.put(url), asyncio.get_event_loop())
+                # Используем глобальный loop из main()
+                asyncio.run_coroutine_threadsafe(url_queue.put(url), main_loop)
         except EOFError:
             break
 
 
 async def main():
+    global main_loop
+    main_loop = asyncio.get_running_loop()
+
     threading.Thread(target=input_thread, daemon=True).start()
     await worker()
 
