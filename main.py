@@ -19,7 +19,7 @@ async def download_video(url: str):
 
     ydl_opts = {
         "outtmpl": "videos/%(title)s.%(ext)s",
-        "format": f"bestvideo+bestaudio/best[filesize<{MAX_SIZE}]",
+        "format": f"(bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best)[filesize<{MAX_SIZE}]",
         "merge_output_format": "mp4",
         "noplaylist": False,
         "quiet": True,
